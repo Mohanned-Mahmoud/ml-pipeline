@@ -1,0 +1,41 @@
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/raw/wine.csv
+      - params.json
+    params:
+      - preprocess
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - data/processed/scaler_params.json
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - params.json
+    params:
+      - train
+    outs:
+      - models/random_forest.pkl
+    metrics:
+      - models/train_metrics.json:
+          cache: false
+
+  tune:
+    cmd: python src/tune.py
+    deps:
+      - src/tune.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - params.json
+    params:
+      - tune
+    outs:
+      - models/gradient_boosting_best.pkl
+      - models/tuning_results.csv
